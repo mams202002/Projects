@@ -1,42 +1,41 @@
 require('dotenv').config();
+const express = require('express');
 const axios = require('axios');
+const path = require('path');
+const app = express();
+const PORT = 3000;
 
 const API_KEY = process.env.INSEE_API_KEY;
 
-async function fetchAmnafi() {
-    // L'URL exacte du mode d'emploi
-    const API_URL = "https://api.insee.fr/api-sirene/3.11/siret";
+app.use(express.static(path.join(__dirname, 'public')));
 
-    console.log("🚀 Connexion à l'API Sirene via X-INSEE-Api-Key-Integration...");
+app.get('/api/commerces', async (req, res) => {
+    // Version ultra-brute : pas de parenthèses, pas d'étoiles.
+    // On cherche "SENEGAL" dans le texte libre de l'établissement au code postal 75018.
+    const q = 'denominationUniteLegale:SENEGAL AND codePostalEtablissement:75018';
 
     try {
-        const response = await axios.get(API_URL, {
+        const response = await axios.get("https://api.insee.fr/api-sirene/3.11/siret", {
             headers: { 
-                'X-INSEE-Api-Key-Integration': API_KEY,
+                'X-INSEE-Api-Key-Integration': API_KEY, 
                 'Accept': 'application/json' 
             },
-            params: { 
-                q: 'denominationUniteLegale:*SENEGAL* AND codePostalEtablissement:75018',
-                nombre: 10 
-            }
+            params: { q, nombre: 20 }
         });
 
-        const data = response.data?.etablissements || [];
-        console.log(`✅ Succès ! ${data.length} établissements trouvés.`);
-
-        data.forEach(e => {
-            console.log(`- ${e.uniteLegale.denominationUniteLegale}`);
-        });
+        console.log(`✅ Connexion réussie !`);
+        res.json(response.data.etablissements || []);
 
     } catch (error) {
-        console.error("❌ ERREUR :");
+        console.error("❌ ÉCHEC :");
         if (error.response) {
-            console.error(`Statut : ${error.response.status}`);
-            console.log("Détail :", error.response.data);
-        } else {
-            console.error(error.message);
+            console.error("Détail INSEE :", error.response.data.header);
+            // Si l'erreur persiste, on logge l'URL exacte générée par Axios
+            console.error("URL testée :", error.config.url + "?q=" + encodeURIComponent(q));
         }
+        res.status(400).json({ error: "Syntaxe rejetée" });
     }
-}
-
-fetchAmnafi();
+});
+app.listen(PORT, () => {
+    console.log(`🚀 Serveur actif : http://localhost:${PORT}`);
+});

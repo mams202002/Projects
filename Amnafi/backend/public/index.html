@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Répertoire Commerces Sénégalais</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f4f4f4; }
+        table { width: 100%; border-collapse: collapse; background: white; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background: #007bff; color: white; }
+        tr:nth-child(even) { background: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h1>Commerces du 18ème</h1>
+    <button onclick="loadData()">Charger les données</button>
+    <table id="resultTable">
+        <thead>
+            <tr>
+                <th>Nom / Enseigne</th>
+                <th>SIRET</th>
+                <th>Adresse</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        async function loadData() {
+            const res = await fetch('/api/commerces');
+            const data = await res.json();
+            const tbody = document.querySelector('#resultTable tbody');
+            tbody.innerHTML = data.map(e => `
+                <tr>
+                    <td>${e.uniteLegale.denominationUniteLegale || e.periodesEtablissement[0].enseigne1Etablissement || 'N/A'}</td>
+                    <td>${e.siret}</td>
+                    <td>${e.adresseEtablissement.numeroVoieEtablissement || ''} ${e.adresseEtablissement.typeVoieEtablissement || ''} ${e.adresseEtablissement.libelleVoieEtablissement || ''}</td>
+                </tr>
+            `).join('');
+        }
+    </script>
+</body>
+</html>
