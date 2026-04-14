@@ -1,27 +1,42 @@
 require('dotenv').config();
 const axios = require('axios');
 
-async function testV311() {
-    console.log("Tentative sur l'API Sirene V3.11...");
-    
+const API_KEY = process.env.INSEE_API_KEY;
+
+async function fetchAmnafi() {
+    // L'URL exacte du mode d'emploi
+    const API_URL = "https://api.insee.fr/api-sirene/3.11/siret";
+
+    console.log("🚀 Connexion à l'API Sirene via X-INSEE-Api-Key-Integration...");
+
     try {
-        const res = await axios.get('https://api.insee.fr/entreprises/sirene/V3.11/siret?q=periode(etatAdministratifEtablissement:A)&nombre=1', {
+        const response = await axios.get(API_URL, {
             headers: { 
-                'X-INSEE-Api-Key-Integration': process.env.INSEE_API_KEY,
-                'Accept': 'application/json'
+                'X-INSEE-Api-Key-Integration': API_KEY,
+                'Accept': 'application/json' 
+            },
+            params: { 
+                q: 'denominationUniteLegale:*SENEGAL* AND codePostalEtablissement:75018',
+                nombre: 10 
             }
         });
 
-        console.log("✅ CONNEXION RÉUSSIE !");
-        console.log("Donnée reçue :", res.data.etablissements[0].uniteLegale.denominationUniteLegale);
-    } catch (err) {
-        if (err.response) {
-            console.error(`❌ ERREUR API : ${err.response.status}`);
-            console.error("Message :", err.response.data.header ? err.response.data.header.message : err.response.data);
+        const data = response.data?.etablissements || [];
+        console.log(`✅ Succès ! ${data.length} établissements trouvés.`);
+
+        data.forEach(e => {
+            console.log(`- ${e.uniteLegale.denominationUniteLegale}`);
+        });
+
+    } catch (error) {
+        console.error("❌ ERREUR :");
+        if (error.response) {
+            console.error(`Statut : ${error.response.status}`);
+            console.log("Détail :", error.response.data);
         } else {
-            console.error("❌ ERREUR RÉSEAU :", err.message);
+            console.error(error.message);
         }
     }
 }
 
-testV311();
+fetchAmnafi();
