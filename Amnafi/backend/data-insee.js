@@ -12,7 +12,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/api/commerces', async (req, res) => {
     // Version ultra-brute : pas de parenthèses, pas d'étoiles.
     // On cherche "SENEGAL" dans le texte libre de l'établissement au code postal 75018.
-    const q = 'denominationUniteLegale:SENEGAL AND codePostalEtablissement:75018';
+    const arrondissements = ['75017', '75018', '75019', '75020'];
+    const zipQuery = arrondissements.join(' OR ');
+    const q = `denominationUniteLegale:SENEGAL AND codePostalEtablissement:(${zipQuery})`;
 
     try {
         const response = await axios.get("https://api.insee.fr/api-sirene/3.11/siret", {
@@ -20,7 +22,7 @@ app.get('/api/commerces', async (req, res) => {
                 'X-INSEE-Api-Key-Integration': API_KEY, 
                 'Accept': 'application/json' 
             },
-            params: { q, nombre: 20 }
+            params: { q, nombre: 100 }
         });
 
         console.log(`✅ Connexion réussie !`);

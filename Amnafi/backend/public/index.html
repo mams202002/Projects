@@ -4,40 +4,104 @@
     <meta charset="UTF-8">
     <title>Répertoire Commerces Sénégalais</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; background: #f4f4f4; }
-        table { width: 100%; border-collapse: collapse; background: white; }
+        body { font-family: sans-serif; padding: 20px; background: #f4f4f4; color: #333; }
+        h1 { color: #2c3e50; }
+        button { 
+            padding: 10px 20px; background: #007bff; color: white; border: none; 
+            cursor: pointer; margin-bottom: 20px; border-radius: 4px;
+        }
+        button:disabled { background: #ccc; }
+        table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
         th { background: #007bff; color: white; }
-        tr:nth-child(even) { background: #f2f2f2; }
+        tr:nth-child(even) { background: #f9f9f9; }
+        .error { color: red; font-weight: bold; margin-bottom: 10px; }
+        th: first-child, td:first-child {
+            width: 40px;
+            text-align: center;
+            font-weight: bold;
+            background: #f8f9fa;
+        }
     </style>
 </head>
 <body>
-    <h1>Commerces du 18ème</h1>
-    <button onclick="loadData()">Charger les données</button>
-    <table id="resultTable">
+    <h1>Répertoire des Commerces (17, 18, 19, 20ème)</h1>
+    
+    <div id="status-message" class="error"></div>
+    <button id="btn-load" onclick="loadData()">Charger les données</button>
+
+    <table id="resultats">
         <thead>
             <tr>
-                <th>Nom / Enseigne</th>
-                <th>SIRET</th>
+                <th>N°</th> <th>Nom de l'enseigne</th>
                 <th>Adresse</th>
+                <th>Arrondissement</th>
             </tr>
         </thead>
-        <tbody></tbody>
+        <tbody id="table-body">
+            </tbody>
     </table>
 
     <script>
-        async function loadData() {
-            const res = await fetch('/api/commerces');
-            const data = await res.json();
-            const tbody = document.querySelector('#resultTable tbody');
-            tbody.innerHTML = data.map(e => `
-                <tr>
-                    <td>${e.uniteLegale.denominationUniteLegale || e.periodesEtablissement[0].enseigne1Etablissement || 'N/A'}</td>
-                    <td>${e.siret}</td>
-                    <td>${e.adresseEtablissement.numeroVoieEtablissement || ''} ${e.adresseEtablissement.typeVoieEtablissement || ''} ${e.adresseEtablissement.libelleVoieEtablissement || ''}</td>
-                </tr>
-            `).join('');
+    async function loadData() {
+        const btn = document.getElementById('btn-load');
+        const tbody = document.getElementById('table-body');
+        const status = document.getElementById('status-message');
+        
+        // Reset interface
+        btn.disabled = true;
+        btn.innerText = "Chargement...";
+        status.innerText = "";
+        tbody.innerHTML = "";
+
+        try {
+            const response = await fetch('/api/commerces');
+            
+            if (!response.ok) throw new Error(`Erreur serveur : ${response.status}`);
+            
+            const data = await response.json();
+            data.sort((a, b) => {
+                const cpA = a.adresseEtablissement?.codePostalEtablissement || "";
+                const cpB = b.adresseEtablissement?.codePostalEtablissement || "";
+                return cpA.localeCompare(cpB);
+            });
+
+
+
+
+            if (data.length === 0) {
+                status.innerText = "Aucun résultat trouvé.";
+                return;
+            }
+
+            data.forEach((etab, index) => {
+                const adresse = etab.adresseEtablissement || {};
+                const unite = etab.uniteLegale || {};
+                
+                // Priorité à l'enseigne, sinon nom légal
+                const nom = (etab.periodesEtablissement && etab.periodesEtablissement[0].enseigne1Etablissement) 
+                            || unite.denominationUniteLegale 
+                            || "Nom inconnu";
+
+                const rue = `${adresse.numeroVoieEtablissement || ''} ${adresse.typeVoieEtablissement || ''} ${adresse.libelleVoieEtablissement || ''}`.trim();
+                const cp = adresse.codePostalEtablissement || "N/A";
+
+                const row = `<tr>
+                    <td>${index + 1}<td>${nom}</td>
+                    <td>${rue || 'Adresse non renseignée'}</td>
+                    <td>${cp}</td>
+                </tr>`;
+                tbody.insertAdjacentHTML('beforeend', row);
+            });
+
+        } catch (error) {
+            console.error(error);
+            status.innerText = "Échec du chargement : " + error.message;
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "Charger les données";
         }
+    }
     </script>
 </body>
 </html>
