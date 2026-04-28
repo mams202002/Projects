@@ -2,106 +2,113 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Répertoire Commerces Sénégalais</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; background: #f4f4f4; color: #333; }
-        h1 { color: #2c3e50; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background: #f8f9fa; color: #333; }
+        .container { max-width: 1000px; margin: auto; }
+        h1 { color: #2c3e50; border-bottom: 2px solid #007bff; padding-bottom: 10px; }
         button { 
-            padding: 10px 20px; background: #007bff; color: white; border: none; 
-            cursor: pointer; margin-bottom: 20px; border-radius: 4px;
+            padding: 12px 24px; background: #007bff; color: white; border: none; 
+            cursor: pointer; margin-bottom: 20px; border-radius: 4px; font-weight: bold;
         }
-        button:disabled { background: #ccc; }
-        table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-        th { background: #007bff; color: white; }
-        tr:nth-child(even) { background: #f9f9f9; }
-        .error { color: red; font-weight: bold; margin-bottom: 10px; }
-        th: first-child, td:first-child {
-            width: 40px;
-            text-align: center;
-            font-weight: bold;
-            background: #f8f9fa;
-        }
+        button:hover { background: #0056b3; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #007bff; color: white; text-transform: uppercase; font-size: 0.9em; }
+        tr:hover { background: #f1f1f1; }
+        .error { color: #d9534f; background: #f2dede; padding: 10px; border-radius: 4px; margin-bottom: 20px; display: none; }
+        .col-index { width: 50px; text-align: center; font-weight: bold; color: #666; }
     </style>
 </head>
 <body>
-    <h1>Répertoire des Commerces (17, 18, 19, 20ème)</h1>
-    
-    <div id="status-message" class="error"></div>
-    <button id="btn-load" onclick="loadData()">Charger les données</button>
+    <div class="container">
+        <h1>Répertoire des Commerces - Paris</h1>
+        <div id="status-message" class="error"></div>
+        <button id="btn-load">Charger les données</button>
 
-    <table id="resultats">
-        <thead>
-            <tr>
-                <th>N°</th> <th>Nom de l'enseigne</th>
-                <th>Adresse</th>
-                <th>Arrondissement</th>
-            </tr>
-        </thead>
-        <tbody id="table-body">
-            </tbody>
-    </table>
+        <table id="resultats">
+            <thead>
+                <tr>
+                    <th class="col-index">N°</th>
+                    <th>Nom de l'enseigne</th>
+                    <th>Adresse</th>
+                    <th>CP</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+                </tbody>
+        </table>
+    </div>
 
     <script>
-    async function loadData() {
-        const btn = document.getElementById('btn-load');
-        const tbody = document.getElementById('table-body');
-        const status = document.getElementById('status-message');
-        
-        // Reset interface
-        btn.disabled = true;
-        btn.innerText = "Chargement...";
-        status.innerText = "";
-        tbody.innerHTML = "";
+        document.getElementById('btn-load').addEventListener('click', loadData);
 
-        try {
-            const response = await fetch('/api/commerces');
+        async function loadData() {
+            const btn = document.getElementById('btn-load');
+            const tbody = document.getElementById('table-body');
+            const status = document.getElementById('status-message');
             
-            if (!response.ok) throw new Error(`Erreur serveur : ${response.status}`);
-            
-            const data = await response.json();
-            data.sort((a, b) => {
-                const cpA = a.adresseEtablissement?.codePostalEtablissement || "";
-                const cpB = b.adresseEtablissement?.codePostalEtablissement || "";
-                return cpA.localeCompare(cpB);
-            });
+            // UI Reset
+            btn.disabled = true;
+            btn.textContent = "Chargement...";
+            status.style.display = "none";
+            tbody.innerHTML = "";
 
-
-
-
-            if (data.length === 0) {
-                status.innerText = "Aucun résultat trouvé.";
-                return;
-            }
-
-            data.forEach((etab, index) => {
-                const adresse = etab.adresseEtablissement || {};
-                const unite = etab.uniteLegale || {};
+            try {
+                const response = await fetch('/api/commerces');
+                if (!response.ok) throw new Error(`Erreur ${response.status}: Service indisponible`);
                 
-                // Priorité à l'enseigne, sinon nom légal
-                const nom = (etab.periodesEtablissement && etab.periodesEtablissement[0].enseigne1Etablissement) 
-                            || unite.denominationUniteLegale 
-                            || "Nom inconnu";
+                let data = await response.json();
 
-                const rue = `${adresse.numeroVoieEtablissement || ''} ${adresse.typeVoieEtablissement || ''} ${adresse.libelleVoieEtablissement || ''}`.trim();
-                const cp = adresse.codePostalEtablissement || "N/A";
+                if (data.length === 0) {
+                    status.textContent = "Aucun résultat trouvé.";
+                    status.style.display = "block";
+                    return;
+                }
 
-                const row = `<tr>
-                    <td>${index + 1}<td>${nom}</td>
-                    <td>${rue || 'Adresse non renseignée'}</td>
-                    <td>${cp}</td>
-                </tr>`;
-                tbody.insertAdjacentHTML('beforeend', row);
-            });
+                // Tri par code postal
+                data.sort((a, b) => (a.adresseEtablissement?.codePostalEtablissement || "")
+                                    .localeCompare(b.adresseEtablissement?.codePostalEtablissement || ""));
 
-        } catch (error) {
-            console.error(error);
-            status.innerText = "Échec du chargement : " + error.message;
-        } finally {
-            btn.disabled = false;
-            btn.innerText = "Charger les données";
+                // Construction propre du fragment (Performance ++)
+                const fragment = document.createDocumentFragment();
+
+                data.forEach((etab, index) => {
+                    const row = document.createElement('tr');
+                    
+                    const adr = etab.adresseEtablissement || {};
+                    const nomEnseigne = etab.periodesEtablissement?.[0]?.enseigne1Etablissement 
+                                     || etab.uniteLegale?.denominationUniteLegale 
+                                     || "Nom inconnu";
+
+                    const rue = `${adr.numeroVoieEtablissement || ''} ${adr.typeVoieEtablissement || ''} ${adr.libelleVoieEtablissement || ''}`.trim();
+
+                    // Création sécurisée des cellules (Zéro XSS)
+                    row.innerHTML = `
+                        <td class="col-index">${index + 1}</td>
+                        <td class="cell-name"></td>
+                        <td class="cell-address"></td>
+                        <td>${adr.codePostalEtablissement || 'N/A'}</td>
+                    `;
+                    
+                    row.querySelector('.cell-name').textContent = nomEnseigne;
+                    row.querySelector('.cell-address').textContent = rue || 'Adresse non renseignée';
+                    
+                    fragment.appendChild(row);
+                });
+
+                tbody.appendChild(fragment);
+
+            } catch (error) {
+                status.textContent = error.message;
+                status.style.display = "block";
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "Charger les données";
+            }
         }
-    }
     </script>
 </body>
 </html>
