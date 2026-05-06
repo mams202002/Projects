@@ -14,12 +14,24 @@
         }
         button:hover { background: #0056b3; }
         button:disabled { background: #ccc; cursor: not-allowed; }
+
+        /* Onglets */
+        .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+        .tab {
+            padding: 8px 16px; border: 2px solid #007bff; background: white;
+            color: #007bff; border-radius: 20px; cursor: pointer; font-weight: bold;
+            font-size: 0.85em; transition: all 0.2s;
+        }
+        .tab:hover { background: #e8f0fe; }
+        .tab.active { background: #007bff; color: white; }
+
         table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; }
         th { background: #007bff; color: white; text-transform: uppercase; font-size: 0.9em; }
         tr:hover { background: #f1f1f1; }
         .error { color: #d9534f; background: #f2dede; padding: 10px; border-radius: 4px; margin-bottom: 20px; display: none; }
         .col-index { width: 50px; text-align: center; font-weight: bold; color: #666; }
+        .badge { font-size: 0.75em; padding: 2px 8px; border-radius: 10px; background: #e8f0fe; color: #007bff; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -28,6 +40,15 @@
         <div id="status-message" class="error"></div>
         <button id="btn-load">Charger les données</button>
 
+        <div class="tabs" id="tabs" style="display:none">
+            <button class="tab active" data-cat="tous">Tous <span class="badge" id="count-tous">0</span></button>
+            <button class="tab" data-cat="restaurants">Restaurants <span class="badge" id="count-restaurants">0</span></button>
+            <button class="tab" data-cat="associations">Associations <span class="badge" id="count-associations">0</span></button>
+            <button class="tab" data-cat="commerces">Commerces <span class="badge" id="count-commerces">0</span></button>
+            <button class="tab" data-cat="coiffure">Coiffure <span class="badge" id="count-coiffure">0</span></button>
+            <button class="tab" data-cat="autres">Autres <span class="badge" id="count-autres">0</span></button>
+        </div>
+
         <table id="resultats">
             <thead>
                 <tr>
@@ -35,80 +56,123 @@
                     <th>Nom de l'enseigne</th>
                     <th>Adresse</th>
                     <th>CP</th>
+                    <th>Catégorie</th>
                 </tr>
             </thead>
-            <tbody id="table-body">
-                </tbody>
+            <tbody id="table-body"></tbody>
         </table>
     </div>
 
     <script>
-        document.getElementById('btn-load').addEventListener('click', loadData);
+        const CATEGORIES = {
+            restaurants: ['56.10A', '56.10B', '56.10C', '56.21Z', '56.29A', '56.29B', '56.30Z'],
+            associations: ['94.99Z', '94.12Z', '94.11Z', '94.20Z', '94.91Z', '94.92Z'],
+            commerces:    ['47.11A', '47.11B', '47.19A', '47.19B', '47.21Z', '47.89Z', '47.91A'],
+            coiffure:     ['96.02A', '96.02B'],
+        };
 
-        async function loadData() {
-            const btn = document.getElementById('btn-load');
+        function getCategorie(codeNAF) {
+            if (!codeNAF) return 'autres';
+            const code = codeNAF.replace('.', ''); // normalise "56.10A" -> "5610A"
+            for (const [cat, codes] of Object.entries(CATEGORIES)) {
+                if (codes.map(c => c.replace('.', '')).includes(code)) return cat;
+            }
+            return 'autres';
+        }
+
+        let allData = []; // stocke tout en mémoire
+        let activeTab = 'tous';
+
+        function renderTable(cat) {
             const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '';
+            const filtered = cat === 'tous' ? allData : allData.filter(e => e._categorie === cat);
+            const fragment = document.createDocumentFragment();
+
+            filtered.forEach((etab, index) => {
+                const row = document.createElement('tr');
+                const adr = etab.adresseEtablissement || {};
+                const nomEnseigne = etab.periodesEtablissement?.[0]?.enseigne1Etablissement
+                                 || etab.uniteLegale?.denominationUniteLegale
+                                 || "Nom inconnu";
+                const rue = `${adr.numeroVoieEtablissement || ''} ${adr.typeVoieEtablissement || ''} ${adr.libelleVoieEtablissement || ''}`.trim();
+
+                row.innerHTML = `
+                    <td class="col-index">${index + 1}</td>
+                    <td class="cell-name"></td>
+                    <td class="cell-address"></td>
+                    <td>${adr.codePostalEtablissement || 'N/A'}</td>
+                    <td><span class="badge">${etab._categorie}</span></td>
+                `;
+                row.querySelector('.cell-name').textContent = nomEnseigne;
+                row.querySelector('.cell-address').textContent = rue || 'Adresse non renseignée';
+                fragment.appendChild(row);
+            });
+
+            tbody.appendChild(fragment);
+        }
+
+        function updateCounts() {
+            const counts = { tous: allData.length, restaurants: 0, associations: 0, commerces: 0, coiffure: 0, autres: 0 };
+            allData.forEach(e => { if (counts[e._categorie] !== undefined) counts[e._categorie]++; });
+            for (const [cat, count] of Object.entries(counts)) {
+                const el = document.getElementById(`count-${cat}`);
+                if (el) el.textContent = count;
+            }
+        }
+
+        // Gestion onglets
+        document.getElementById('tabs').addEventListener('click', e => {
+            const tab = e.target.closest('.tab');
+            if (!tab) return;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            activeTab = tab.dataset.cat;
+            renderTable(activeTab);
+        });
+
+        document.getElementById('btn-load').addEventListener('click', async () => {
+            const btn = document.getElementById('btn-load');
             const status = document.getElementById('status-message');
-            
-            // UI Reset
+
             btn.disabled = true;
             btn.textContent = "Chargement...";
             status.style.display = "none";
-            tbody.innerHTML = "";
 
             try {
                 const response = await fetch('/api/commerces');
                 if (!response.ok) throw new Error(`Erreur ${response.status}: Service indisponible`);
-                
-                let data = await response.json();
 
+                let data = await response.json();
                 if (data.length === 0) {
                     status.textContent = "Aucun résultat trouvé.";
                     status.style.display = "block";
                     return;
                 }
 
-                // Tri par code postal
-                data.sort((a, b) => (a.adresseEtablissement?.codePostalEtablissement || "")
-                                    .localeCompare(b.adresseEtablissement?.codePostalEtablissement || ""));
-
-                // Construction propre du fragment (Performance ++)
-                const fragment = document.createDocumentFragment();
-
-                data.forEach((etab, index) => {
-                    const row = document.createElement('tr');
-                    
-                    const adr = etab.adresseEtablissement || {};
-                    const nomEnseigne = etab.periodesEtablissement?.[0]?.enseigne1Etablissement 
-                                     || etab.uniteLegale?.denominationUniteLegale 
-                                     || "Nom inconnu";
-
-                    const rue = `${adr.numeroVoieEtablissement || ''} ${adr.typeVoieEtablissement || ''} ${adr.libelleVoieEtablissement || ''}`.trim();
-
-                    // Création sécurisée des cellules (Zéro XSS)
-                    row.innerHTML = `
-                        <td class="col-index">${index + 1}</td>
-                        <td class="cell-name"></td>
-                        <td class="cell-address"></td>
-                        <td>${adr.codePostalEtablissement || 'N/A'}</td>
-                    `;
-                    
-                    row.querySelector('.cell-name').textContent = nomEnseigne;
-                    row.querySelector('.cell-address').textContent = rue || 'Adresse non renseignée';
-                    
-                    fragment.appendChild(row);
+                // Enrichissement : on attache la catégorie à chaque établissement
+                data.forEach(etab => {
+                    const codeNAF = etab.activitePrincipaleEtablissement;
+                    etab._categorie = getCategorie(codeNAF);
                 });
 
-                tbody.appendChild(fragment);
+                // Tri par code postal
+                data.sort((a, b) => (a.adresseEtablissement?.codePostalEtablissement || '')
+                                    .localeCompare(b.adresseEtablissement?.codePostalEtablissement || ''));
+
+                allData = data;
+                updateCounts();
+                renderTable('tous');
+                document.getElementById('tabs').style.display = 'flex';
 
             } catch (error) {
                 status.textContent = error.message;
                 status.style.display = "block";
             } finally {
                 btn.disabled = false;
-                btn.textContent = "Charger les données";
+                btn.textContent = "Recharger les données";
             }
-        }
+        });
     </script>
 </body>
 </html>
