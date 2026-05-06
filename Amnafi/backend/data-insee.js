@@ -14,7 +14,10 @@ app.get('/api/commerces', async (req, res) => {
     // On cherche "SENEGAL" dans le texte libre de l'établissement au code postal 75018.
     const arrondissements = ['75*'];
     const zipQuery = arrondissements.join(' OR ');
-    const q = `denominationUniteLegale:*SENEGAL* AND codePostalEtablissement:(${zipQuery})`;
+    const KEYWORDS = ['SENEGAL', 'DAKAR'];
+    const keywordQuery = KEYWORDS.map(k => `denominationUniteLegale:*${k}*`).join(' OR ');
+    const q = `(${keywordQuery}) AND codePostalEtablissement:(${zipQuery})`;
+    
 
     try {
         const response = await axios.get("https://api.insee.fr/api-sirene/3.11/siret", {
