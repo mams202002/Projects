@@ -13,10 +13,10 @@ const KEYWORDS = ['SENEGAL'];
 
 // --- Codes NAF sans point, exactement comme l'API les retourne ---
 const CATEGORIES = {
-    restaurants:  ['5610A', '5610B', '5610C', '5621Z', '5629A', '5629B', '5630Z'],
-    associations: ['9499Z', '9412Z', '9411Z', '9420Z', '9491Z', '9492Z'],
-    commerces:    ['4711A', '4711B', '4719A', '4719B', '4721Z', '4789Z', '4791A'],
-    coiffure:     ['9602A', '9602B'],
+    restaurants:  ['56.10A', '56.10B', '56.10C', '56.21Z', '56.29A', '56.29B', '56.30Z'],
+    associations: ['94.99Z', '94.12Z', '94.11Z', '94.20Z', '94.91Z', '94.92Z'],
+    commerces:    ['47.11A', '47.11B', '47.19A', '47.19B', '47.21Z', '47.89Z', '47.91A'],
+    coiffure:     ['96.02A', '96.02B'],
 };
 
 app.use(express.static(path.join(__dirname, 'public')));

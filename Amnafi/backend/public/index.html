@@ -73,9 +73,8 @@
 
         function getCategorie(codeNAF) {
             if (!codeNAF) return 'autres';
-            const code = codeNAF.replace('.', ''); // normalise "56.10A" -> "5610A"
             for (const [cat, codes] of Object.entries(CATEGORIES)) {
-                if (codes.map(c => c.replace('.', '')).includes(code)) return cat;
+                if (codes.includes(codeNAF)) return cat;
             }
             return 'autres';
         }
@@ -152,7 +151,7 @@
 
                 // Enrichissement : on attache la catégorie à chaque établissement
                 data.forEach(etab => {
-                    const codeNAF = etab.activitePrincipaleEtablissement;
+                    const codeNAF = etab.periodesEtablissement?.[0]?.activitePrincipaleEtablissement;
                     etab._categorie = getCategorie(codeNAF);
                 });
 
