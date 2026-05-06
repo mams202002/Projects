@@ -9,7 +9,9 @@ const PORT = 3000;
 const API_KEY = process.env.INSEE_API_KEY;
 
 // --- Mots-clés de recherche ---
-const KEYWORDS = ['SENEGAL'];
+const KEYWORDS = ['SENEGAL','DAKAR', 'TERANGA', 'BAOBAB', 'WATOO', 'YASSA', 'MAFE', 
+    'THIEB', 'DIBI', 'BISSAP', 'SINE', 'SALOUM', 'CASAMANCE', 'GOREE', 
+    'SUNU', 'NDAKARU', 'NGAAY'];
 
 // --- Codes NAF sans point, exactement comme l'API les retourne ---
 const CATEGORIES = {
@@ -23,11 +25,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/api/commerces', async (req, res) => {
     const arrondissements = [
-        '75*'
+        '75*','92*'
     ];
 
     const zipQuery     = arrondissements.join(' OR ');
-    const keywordQuery = KEYWORDS.map(k => `denominationUniteLegale:*${k}*`).join(' OR ');
+    const keywordQuery = KEYWORDS.map(k => `denominationUniteLegale:*${k}`).join(' OR ');
     const q = `(${keywordQuery}) AND codePostalEtablissement:(${zipQuery})`;
 
     try {
@@ -36,7 +38,7 @@ app.get('/api/commerces', async (req, res) => {
                 'X-INSEE-Api-Key-Integration': API_KEY,
                 'Accept': 'application/json'
             },
-            params: { q, nombre: 200 }
+            params: { q, nombre: 1000}
         });
 
         console.log(`✅ Connexion réussie ! Total : ${response.data.header?.total}`);
