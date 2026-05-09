@@ -5,40 +5,185 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AMNAFI</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background: #f8f9fa; color: #333; }
-        .container { max-width: 1000px; margin: auto; }
-        h1 { color: #2c3e50; border-bottom: 2px solid #007bff; padding-bottom: 10px; }
-        button { 
-            padding: 12px 24px; background: #007bff; color: white; border: none; 
-            cursor: pointer; margin-bottom: 20px; border-radius: 4px; font-weight: bold;
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            padding: 40px 20px;
+            background: #f0f2f5;
+            color: #333;
+            line-height: 1.6;
         }
-        button:hover { background: #0056b3; }
-        button:disabled { background: #ccc; cursor: not-allowed; }
+        .container {
+            max-width: 1100px;
+            margin: auto;
+        }
 
-        /* Onglets */
-        .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+        /* Titre Stylisé et Centré */
+        h1 {
+            text-align: center;
+            color: #1a2a6c;
+            font-size: 3em;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            position: relative;
+            background: linear-gradient(to right, #1a2a6c, #b21f1f, #fdbb2d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 5px;
+            background: linear-gradient(to right, #1a2a6c, #fdbb2d);
+            border-radius: 10px;
+        }
+
+        /* Conteneur de contrôle */
+        .controls {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        button#btn-load {
+            padding: 16px 32px;
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.1em;
+            box-shadow: 0 4px 15px rgba(0,123,255,0.3);
+            transition: all 0.3s ease;
+        }
+
+        button#btn-load:hover {
+            background: #0056b3;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,123,255,0.4);
+        }
+
+        button#btn-load:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Onglets centrés */
+        .tabs {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
         .tab {
-            padding: 8px 16px; border: 2px solid #007bff; background: white;
-            color: #007bff; border-radius: 20px; cursor: pointer; font-weight: bold;
-            font-size: 0.85em; transition: all 0.2s;
+            padding: 10px 22px;
+            border: 1px solid #ddd;
+            background: white;
+            color: #555;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9em;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
-        .tab:hover { background: #e8f0fe; }
-        .tab.active { background: #007bff; color: white; }
 
-        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; }
-        th { background: #007bff; color: white; text-transform: uppercase; font-size: 0.9em; }
-        tr:hover { background: #f1f1f1; }
-        .error { color: #d9534f; background: #f2dede; padding: 10px; border-radius: 4px; margin-bottom: 20px; display: none; }
-        .col-index { width: 50px; text-align: center; font-weight: bold; color: #666; }
-        .badge { font-size: 0.75em; padding: 2px 8px; border-radius: 10px; background: #e8f0fe; color: #007bff; font-weight: bold; }
+        .tab:hover {
+            background: #f8f9fa;
+            border-color: #007bff;
+            color: #007bff;
+        }
+
+        .tab.active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+            box-shadow: 0 4px 10px rgba(0,123,255,0.2);
+        }
+
+        /* Tableau moderne */
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+
+        th {
+            background: #1a2a6c;
+            color: white;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            letter-spacing: 1px;
+            padding: 20px 15px;
+            text-align: left;
+        }
+
+        td {
+            padding: 18px 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background: #f8fbff;
+        }
+
+        .badge {
+            font-size: 0.75em;
+            padding: 5px 12px;
+            border-radius: 20px;
+            background: #eef2ff;
+            color: #4338ca;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .error {
+            color: #721c24;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            text-align: center;
+            display: none;
+        }
+
+        .col-index {
+            width: 60px;
+            text-align: center;
+            font-weight: bold;
+            color: #888;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Hé yaw AMNAFI!</h1>
+        
         <div id="status-message" class="error"></div>
-        <button id="btn-load">Charger les données</button>
+        
+        <div class="controls">
+            <button id="btn-load">Charger les données</button>
+        </div>
 
         <div class="tabs" id="tabs" style="display:none">
             <button class="tab active" data-cat="tous">Tous <span class="badge" id="count-tous">0</span></button>
@@ -79,7 +224,7 @@
             return 'autres';
         }
 
-        let allData = []; // stocke tout en mémoire
+        let allData = [];
         let activeTab = 'tous';
 
         function renderTable(cat) {
@@ -120,7 +265,6 @@
             }
         }
 
-        // Gestion onglets
         document.getElementById('tabs').addEventListener('click', e => {
             const tab = e.target.closest('.tab');
             if (!tab) return;
@@ -149,13 +293,11 @@
                     return;
                 }
 
-                // Enrichissement : on attache la catégorie à chaque établissement
                 data.forEach(etab => {
                     const codeNAF = etab.periodesEtablissement?.[0]?.activitePrincipaleEtablissement;
                     etab._categorie = getCategorie(codeNAF);
                 });
 
-                // Tri par code postal
                 data.sort((a, b) => (a.adresseEtablissement?.codePostalEtablissement || '')
                                     .localeCompare(b.adresseEtablissement?.codePostalEtablissement || ''));
 
