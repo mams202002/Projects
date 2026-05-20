@@ -9,9 +9,9 @@ const PORT = 3000;
 const API_KEY = process.env.INSEE_API_KEY;
 
 // --- Mots-clés de recherche ---
-const KEYWORDS = ['SENEGAL','DAKAR', 'TERANGA', 'BAOBAB', 'YASSA', 'MAFE', 
-    'THIEB', 'DIBI', 'BISSAP', 'SALOUM', 'CASAMANCE', 'GOREE', 
-    'SUNU', 'NDAKARU', 'NGAAY'];
+const KEYWORDS = ['SENEGAL','DAKAR', 'TERANGA', 'YASSA', 'MAFE', 
+    'THIEB', 'DIBI', 'BISSAP','CASAMANCE', 'GOREE', 
+    'SUNU', 'NDAKARU'];
 
 // --- Codes NAF sans point, exactement comme l'API les retourne ---
 const CATEGORIES = {
@@ -38,7 +38,7 @@ app.get('/api/commerces', async (req, res) => {
                 'X-INSEE-Api-Key-Integration': API_KEY,
                 'Accept': 'application/json'
             },
-            params: { q, nombre: 100}
+            params: { q, nombre: 500}
         });
 
         console.log(`✅ Connexion réussie ! Total : ${response.data.header?.total}`);
