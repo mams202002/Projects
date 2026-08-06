@@ -4,316 +4,58 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AMNAFI</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            padding: 40px 20px;
-            background: #f0f2f5;
-            color: #333;
-            line-height: 1.6;
-        }
-        .container {
-            max-width: 1100px;
-            margin: auto;
-        }
-
-        /* Titre Stylisé et Centré */
-        h1 {
-            text-align: center;
-            color: #1a2a6c;
-            font-size: 3em;
-            margin-bottom: 40px;
-            padding-bottom: 20px;
-            position: relative;
-            background: linear-gradient(to right, #1a2a6c, #b21f1f, #fdbb2d);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-        }
-
-        h1::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80px;
-            height: 5px;
-            background: linear-gradient(to right, #1a2a6c, #fdbb2d);
-            border-radius: 10px;
-        }
-
-        /* Conteneur de contrôle */
-        .controls {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        button#btn-load {
-            padding: 16px 32px;
-            background: #007bff;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 50px;
-            font-weight: bold;
-            font-size: 1.1em;
-            box-shadow: 0 4px 15px rgba(0,123,255,0.3);
-            transition: all 0.3s ease;
-        }
-
-        button#btn-load:hover {
-            background: #0056b3;
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0,123,255,0.4);
-        }
-
-        button#btn-load:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        /* Onglets centrés */
-        .tabs {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-bottom: 30px;
-        }
-
-        .tab {
-            padding: 10px 22px;
-            border: 1px solid #ddd;
-            background: white;
-            color: #555;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.9em;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-
-        .tab:hover {
-            background: #f8f9fa;
-            border-color: #007bff;
-            color: #007bff;
-        }
-
-        .tab.active {
-            background: #007bff;
-            color: white;
-            border-color: #007bff;
-            box-shadow: 0 4px 10px rgba(0,123,255,0.2);
-        }
-
-        /* Tableau moderne */
-        table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-        }
-
-        th {
-            background: #1a2a6c;
-            color: white;
-            text-transform: uppercase;
-            font-size: 0.85em;
-            letter-spacing: 1px;
-            padding: 20px 15px;
-            text-align: left;
-        }
-
-        td {
-            padding: 18px 15px;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        tr:hover {
-            background: #f8fbff;
-        }
-
-        .badge {
-            font-size: 0.75em;
-            padding: 5px 12px;
-            border-radius: 20px;
-            background: #eef2ff;
-            color: #4338ca;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
-        .error {
-            color: #721c24;
-            background: #f8d7da;
-            border: 1px solid #f5c6cb;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 25px;
-            text-align: center;
-            display: none;
-        }
-
-        .col-index {
-            width: 60px;
-            text-align: center;
-            font-weight: bold;
-            color: #888;
-        }
-    </style>
+    
+    <!-- Typographie Moderne -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Feuillets de style -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h1>Hé yaw AMNAFI!</h1>
+        <header>
+            <h1>AMNAFI</h1>
+            <p class="subtitle">Annuaire des établissements et commerces</p>
+        </header>
         
         <div id="status-message" class="error"></div>
         
         <div class="controls">
-            <button id="btn-load">Charger les données</button>
+            <button id="btn-load" class="btn-primary">Charger les données</button>
         </div>
 
-        <div class="tabs" id="tabs" style="display:none">
-            <button class="tab active" data-cat="tous">Tous <span class="badge" id="count-tous">0</span></button>
-            <button class="tab" data-cat="restaurants">Restaurants <span class="badge" id="count-restaurants">0</span></button>
-            <button class="tab" data-cat="associations">Associations <span class="badge" id="count-associations">0</span></button>
-            <button class="tab" data-cat="commerces">Commerces <span class="badge" id="count-commerces">0</span></button>
-            <button class="tab" data-cat="coiffure">Coiffure <span class="badge" id="count-coiffure">0</span></button>
-            <button class="tab" data-cat="autres">Autres <span class="badge" id="count-autres">0</span></button>
+        <div class="tabs-container">
+            <div class="tabs" id="tabs" style="display:none">
+                <button class="tab active" data-cat="tous">Tous <span class="badge" id="count-tous">0</span></button>
+                <button class="tab" data-cat="restaurants">Restaurants <span class="badge" id="count-restaurants">0</span></button>
+                <button class="tab" data-cat="associations">Associations <span class="badge" id="count-associations">0</span></button>
+                <button class="tab" data-cat="commerces">Commerces <span class="badge" id="count-commerces">0</span></button>
+                <button class="tab" data-cat="coiffure">Coiffure <span class="badge" id="count-coiffure">0</span></button>
+                <button class="tab" data-cat="autres">Autres <span class="badge" id="count-autres">0</span></button>
+            </div>
         </div>
 
-        <table id="resultats">
-            <thead>
-                <tr>
-                    <th class="col-index">N°</th>
-                    <th>Nom de l'enseigne</th>
-                    <th>Adresse</th>
-                    <th>CP</th>
-                    <th>Catégorie</th>
-                </tr>
-            </thead>
-            <tbody id="table-body"></tbody>
-        </table>
+        <div class="table-card">
+            <table id="resultats">
+                <thead>
+                    <tr>
+                        <th class="col-index">#</th>
+                        <th>Enseigne</th>
+                        <th>Adresse</th>
+                        <th>CP</th>
+                        <th>Catégorie</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    <!-- Injection dynamique via script.js -->
+                </tbody>
+            </table>
+        </div>
     </div>
 
-    <script>
-        const CATEGORIES = {
-            restaurants: ['56.10A', '56.10B', '56.10C', '56.21Z', '56.29A', '56.29B', '56.30Z'],
-            associations: ['94.99Z', '94.12Z', '94.11Z', '94.20Z', '94.91Z', '94.92Z'],
-            commerces:    ['47.11A', '47.11B', '47.19A', '47.19B', '47.21Z', '47.89Z', '47.91A'],
-            coiffure:     ['96.02A', '96.02B'],
-        };
-
-        function getCategorie(codeNAF) {
-            if (!codeNAF) return 'autres';
-            for (const [cat, codes] of Object.entries(CATEGORIES)) {
-                if (codes.includes(codeNAF)) return cat;
-            }
-            return 'autres';
-        }
-
-        let allData = [];
-        let activeTab = 'tous';
-
-        function renderTable(cat) {
-            const tbody = document.getElementById('table-body');
-            tbody.innerHTML = '';
-            const filtered = cat === 'tous' ? allData : allData.filter(e => e._categorie === cat);
-            const fragment = document.createDocumentFragment();
-
-            filtered.forEach((etab, index) => {
-                const row = document.createElement('tr');
-                const adr = etab.adresseEtablissement || {};
-                const nomEnseigne = etab.periodesEtablissement?.[0]?.enseigne1Etablissement
-                                 || etab.uniteLegale?.denominationUniteLegale
-                                 || "Nom inconnu";
-                const rue = `${adr.numeroVoieEtablissement || ''} ${adr.typeVoieEtablissement || ''} ${adr.libelleVoieEtablissement || ''}`.trim();
-
-                row.innerHTML = `
-                    <td class="col-index">${index + 1}</td>
-                    <td class="cell-name"></td>
-                    <td class="cell-address"></td>
-                    <td>${adr.codePostalEtablissement || 'N/A'}</td>
-                    <td><span class="badge">${etab._categorie}</span></td>
-                `;
-                row.querySelector('.cell-name').textContent = nomEnseigne;
-                row.querySelector('.cell-address').textContent = rue || 'Adresse non renseignée';
-                fragment.appendChild(row);
-            });
-
-            tbody.appendChild(fragment);
-        }
-
-        function updateCounts() {
-            const counts = { tous: allData.length, restaurants: 0, associations: 0, commerces: 0, coiffure: 0, autres: 0 };
-            allData.forEach(e => { if (counts[e._categorie] !== undefined) counts[e._categorie]++; });
-            for (const [cat, count] of Object.entries(counts)) {
-                const el = document.getElementById(`count-${cat}`);
-                if (el) el.textContent = count;
-            }
-        }
-
-        document.getElementById('tabs').addEventListener('click', e => {
-            const tab = e.target.closest('.tab');
-            if (!tab) return;
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-            activeTab = tab.dataset.cat;
-            renderTable(activeTab);
-        });
-
-        document.getElementById('btn-load').addEventListener('click', async () => {
-            const btn = document.getElementById('btn-load');
-            const status = document.getElementById('status-message');
-
-            btn.disabled = true;
-            btn.textContent = "Chargement...";
-            status.style.display = "none";
-
-            try {
-                const response = await fetch('/api/commerces');
-                if (!response.ok) throw new Error(`Erreur ${response.status}: Service indisponible`);
-
-                let data = await response.json();
-                if (data.length === 0) {
-                    status.textContent = "Aucun résultat trouvé.";
-                    status.style.display = "block";
-                    return;
-                }
-
-                data.forEach(etab => {
-                    const codeNAF = etab.periodesEtablissement?.[0]?.activitePrincipaleEtablissement;
-                    etab._categorie = getCategorie(codeNAF);
-                });
-
-                data.sort((a, b) => (a.adresseEtablissement?.codePostalEtablissement || '')
-                                    .localeCompare(b.adresseEtablissement?.codePostalEtablissement || ''));
-
-                allData = data;
-                updateCounts();
-                renderTable('tous');
-                document.getElementById('tabs').style.display = 'flex';
-
-            } catch (error) {
-                status.textContent = error.message;
-                status.style.display = "block";
-            } finally {
-                btn.disabled = false;
-                btn.textContent = "Recharger les données";
-            }
-        });
-    </script>
+    <!-- Script JS côté client -->
+    <script src="script.js"></script>
 </body>
 </html>

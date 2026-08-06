@@ -1,0 +1,230 @@
+:root {
+    --bg-main: #f8fafc;
+    --surface: #ffffff;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #94a3b8;
+    --primary: #2563eb;
+    --primary-hover: #1d4ed8;
+    --border: #e2e8f0;
+    --radius-lg: 16px;
+    --radius-md: 10px;
+    --radius-sm: 6px;
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    line-height: 1.5;
+    padding: 40px 16px;
+    -webkit-font-smoothing: antialiased;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+/* En-tête */
+header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+h1 {
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    letter-spacing: -0.025em;
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+/* Boutons / Actions */
+.controls {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 32px;
+}
+
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    background-color: var(--primary);
+    color: #ffffff;
+    border: none;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Onglets */
+.tabs-container {
+    overflow-x: auto;
+    margin-bottom: 24px;
+    padding-bottom: 4px;
+}
+
+.tabs {
+    display: inline-flex;
+    background: #e2e8f0;
+    padding: 4px;
+    border-radius: var(--radius-md);
+    gap: 2px;
+}
+
+.tab {
+    padding: 8px 16px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tab:hover {
+    color: var(--text-primary);
+}
+
+.tab.active {
+    background: var(--surface);
+    color: var(--text-primary);
+    box-shadow: var(--shadow-sm);
+}
+
+.badge {
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 12px;
+    background: #f1f5f9;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.tab.active .badge {
+    background: #eff6ff;
+    color: var(--primary);
+}
+
+/* Container de Table */
+.table-card {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+th {
+    background: #f8fafc;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+td {
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+tr:hover td {
+    background-color: #f8fafc;
+}
+
+.cell-name {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.col-index {
+    width: 50px;
+    text-align: center;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.tag-cat {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: #f1f5f9;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+/* Zone d'erreur */
+.error {
+    color: #991b1b;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    margin-bottom: 24px;
+    font-size: 0.9rem;
+    text-align: center;
+    display: none;
+}
+
+.link-google {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.link-google:hover {
+    text-decoration: underline;
+    color: #1d4ed8;
+}
