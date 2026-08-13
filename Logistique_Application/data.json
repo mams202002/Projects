@@ -1,0 +1,17 @@
+{
+  "stock": [
+    { "id": "A101", "emplacement": "Allée A - Rack 1", "designation": "Disque de frein Avant", "quantite": 50 },
+    { "id": "B202", "emplacement": "Allée B - Rack 2", "designation": "Plaquettes de frein", "quantite": 120 },
+    { "id": "C303", "emplacement": "Allée C - Rack 3", "designation": "Filtre à huile", "quantite": 80 }
+  ],
+  "commandes": [
+    {
+      "id_commande": "CMD-001",
+      "statut": "À préparer",
+      "articles": [
+        { "id_article": "A101", "quantite_demandee": 2 },
+        { "id_article": "C303", "quantite_demandee": 5 }
+      ]
+    }
+  ]
+}

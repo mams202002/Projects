@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestion & Stats Potager</title>
+  <!-- CDN Chart.js pour le graphique -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header>
+    <h1>🌱 JardinEmma</h1>
+  </header>
+
+  <main class="container">
+    
+    <!-- SECTION KPIS -->
+    <section class="kpi-grid">
+      <div class="card kpi">
+        <h3>Poids Récolté</h3>
+        <p class="stat"><span id="kpi-poids">0</span> <small>kg</small></p>
+      </div>
+      <div class="card kpi">
+        <h3>Valeur Estimée</h3>
+        <p class="stat"><span id="kpi-valeur">0</span> <small>€</small></p>
+      </div>
+      <div class="card kpi">
+        <h3>Rendement / m²</h3>
+        <p class="stat"><span id="kpi-rendement-kg">0</span> <small>kg/m²</small></p>
+        <p class="sub-stat"><span id="kpi-rendement-euro">0</span> €/m²</p>
+      </div>
+      <div class="card kpi">
+        <h3>Surface Totale</h3>
+        <p class="stat"><span id="kpi-surface">0</span> <small>m²</small></p>
+      </div>
+    </section>
+
+    <!-- SECTION FORMULAIRES & GRAPHIQUE -->
+    <section class="main-grid">
+      
+      <!-- FORMULAIRE : AJOUTER UNE RÉCOLTE -->
+      <div class="card">
+        <h2>📥 Enregistrer une récolte</h2>
+        <form id="form-recolte">
+          <div class="form-group">
+            <label for="zoneId">Zone de culture</label>
+            <select id="zoneId" required>
+              <!-- Rempli dynamiquement via JS -->
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="legume">Légume</label>
+            <input type="text" id="legume" placeholder="ex: Tomate, Courgette..." required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="poidsKg">Poids (kg)</label>
+              <input type="number" step="0.01" id="poidsKg" placeholder="0.00" required>
+            </div>
+
+            <div class="form-group">
+              <label for="prixKgRef">Prix marché (€/kg)</label>
+              <input type="number" step="0.10" id="prixKgRef" value="4.50" required>
+            </div>
+          </div>
+
+          <button type="submit" class="btn">Ajouter la récolte</button>
+        </form>
+      </div>
+
+      <!-- GRAPHIQUE DES RÉCOLTES -->
+      <div class="card">
+        <h2>📊 Répartition des récoltes (kg)</h2>
+        <div class="chart-container">
+          <canvas id="chartLegumes"></canvas>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- SECTION SECONDAIRE : AJOUTER UNE ZONE & DERNIÈRES RÉCOLTES -->
+    <section class="main-grid">
+      
+      <!-- FORMULAIRE : AJOUTER UNE ZONE -->
+      <div class="card">
+        <h2>📐 Ajouter une zone de culture</h2>
+        <form id="form-zone">
+          <div class="form-group">
+            <label for="nomZone">Nom de la zone</label>
+            <input type="text" id="nomZone" placeholder="ex: Parcelle B, Serre 2..." required>
+          </div>
+
+          <div class="form-group">
+            <label for="surfaceZone">Surface (m²)</label>
+            <input type="number" step="0.1" id="surfaceZone" placeholder="ex: 5.5" required>
+          </div>
+
+          <button type="submit" class="btn btn-secondary">Créer la zone</button>
+        </form>
+      </div>
+
+      <!-- TABLEAU DES DERNIÈRES RÉCOLTES -->
+      <div class="card">
+        <h2>📋 Dernières récoltes</h2>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Légume</th>
+                <th>Poids</th>
+                <th>Valeur</th>
+              </tr>
+            </thead>
+            <tbody id="tableau-recoltes">
+              <!-- Rempli dynamiquement via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
