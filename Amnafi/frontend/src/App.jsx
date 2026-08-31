@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Search, MapPin, ExternalLink, RefreshCw, Utensils, Users, ShoppingBag, Scissors, Building } from 'lucide-react';
 import './index.css';
 
 const CATEGORIES = {
@@ -40,6 +41,7 @@ function getAdresse(e) {
 export default function App() {
   const [data, setData] = useState([]);
   const [activeTab, setActiveTab] = useState('tous');
+  const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [hasLoaded, setHasLoaded] = useState(false);
@@ -60,6 +62,21 @@ export default function App() {
     }
   };
 
+  const ouvrirGoogle = (nom, adresse, cp) => {
+    const query = encodeURIComponent(`${nom} ${adresse} ${cp}`);
+    window.open(`https://www.google.com/search?q=${query}`, '_blank');
+  };
+
+  // Filtrage combiné Onglets + Recherche texte
+  const filteredData = data.filter((e) => {
+    const cat = getCategorie(e.uniteLegale?.activitePrincipaleUniteLegale);
+    const matchesTab = activeTab === 'tous' || cat === activeTab;
+    const nom = getNom(e).toLowerCase();
+    const adresse = getAdresse(e).toLowerCase();
+    const matchesSearch = nom.includes(searchTerm.toLowerCase()) || adresse.includes(searchTerm.toLowerCase());
+    return matchesTab && matchesSearch;
+  });
+
   const counts = {
     tous: data.length,
     restaurants: data.filter(e => getCategorie(e.uniteLegale?.activitePrincipaleUniteLegale) === 'restaurants').length,
@@ -69,15 +86,6 @@ export default function App() {
     autres: data.filter(e => getCategorie(e.uniteLegale?.activitePrincipaleUniteLegale) === 'autres').length,
   };
 
-  const filteredData = activeTab === 'tous'
-    ? data
-    : data.filter(e => getCategorie(e.uniteLegale?.activitePrincipaleUniteLegale) === activeTab);
-
-  const ouvrirGoogle = (nom, adresse, cp) => {
-    const query = encodeURIComponent(`${nom} ${adresse} ${cp}`);
-    window.open(`https://www.google.com/search?q=${query}`, '_blank');
-  };
-
   return (
     <div className="container">
       <header>
@@ -85,42 +93,43 @@ export default function App() {
         <p className="subtitle">Annuaire des établissements et commerces</p>
       </header>
 
-      {error && <div id="status-message" className="error">{error}</div>}
+      {error && <div style={{ color: '#ef4444', textAlign: 'center', marginBottom: '16px' }}>{error}</div>}
 
       <div className="controls">
         <button className="btn-primary" onClick={chargerDonnees} disabled={loading}>
+          <RefreshCw size={18} className={loading ? 'spin' : ''} />
           {loading ? 'Chargement...' : 'Charger les données'}
         </button>
       </div>
 
       {hasLoaded && (
-        <div className="tabs-container">
-          <div className="tabs" id="tabs">
-            {['tous', 'restaurants', 'associations', 'commerces', 'coiffure', 'autres'].map((cat) => (
-              <button
-                key={cat}
-                className={`tab ${activeTab === cat ? 'active' : ''}`}
-                onClick={() => setActiveTab(cat)}
-              >
-                {cat.charAt(0).toUpperCase() + cat.slice(1)} <span className="badge">{counts[cat]}</span>
-              </button>
-            ))}
+        <>
+          <div className="search-bar-wrapper">
+            <Search className="search-icon" size={20} />
+            <input
+              type="text"
+              className="search-input"
+              placeholder="Rechercher une enseigne, une adresse..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
-        </div>
-      )}
 
-      <div className="table-card">
-        <table id="resultats">
-          <thead>
-            <tr>
-              <th className="col-index">#</th>
-              <th>Enseigne</th>
-              <th>Adresse</th>
-              <th>CP</th>
-              <th>Catégorie</th>
-            </tr>
-          </thead>
-          <tbody id="table-body">
+          <div className="tabs-container">
+            <div className="tabs">
+              {['tous', 'restaurants', 'associations', 'commerces', 'coiffure', 'autres'].map((cat) => (
+                <button
+                  key={cat}
+                  className={`tab ${activeTab === cat ? 'active' : ''}`}
+                  onClick={() => setActiveTab(cat)}
+                >
+                  {cat.charAt(0).toUpperCase() + cat.slice(1)} <span className="badge">{counts[cat]}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="cards-grid">
             {filteredData.map((e, index) => {
               const nom = getNom(e);
               const adresse = getAdresse(e);
@@ -128,22 +137,33 @@ export default function App() {
               const cat = getCategorie(e.uniteLegale?.activitePrincipaleUniteLegale);
 
               return (
-                <tr 
-                  key={e.siren || index} 
+                <div
+                  key={e.siren || index}
+                  className="card"
                   onClick={() => ouvrirGoogle(nom, adresse, cp)}
-                  style={{ cursor: 'pointer' }}
                 >
-                  <td className="col-index">{index + 1}</td>
-                  <td><strong>{nom}</strong></td>
-                  <td>{adresse}</td>
-                  <td>{cp}</td>
-                  <td><span className={`badge-cat ${cat}`}>{cat}</span></td>
-                </tr>
+                  <div className="card-header">
+                    <h2 className="card-title">{nom}</h2>
+                    <span className={`badge-cat ${cat}`}>{cat}</span>
+                  </div>
+
+                  <div className="card-body">
+                    <div className="card-info">
+                      <MapPin size={16} />
+                      <span>{adresse}, {cp}</span>
+                    </div>
+                  </div>
+
+                  <div className="card-footer">
+                    <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>SIREN: {e.siren}</span>
+                    <span className="external-link">Voir sur Google <ExternalLink size={14} /></span>
+                  </div>
+                </div>
               );
             })}
-          </tbody>
-        </table>
-      </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
