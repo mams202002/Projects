@@ -26,7 +26,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/api/commerces', async (req, res) => {
     const arrondissements = [
-        '75*','92*'
+        '75*','91*','92*','93*','94*','95*','77*','78*'
     ];
 
     const zipQuery     = arrondissements.join(' OR ');
@@ -39,7 +39,7 @@ app.get('/api/commerces', async (req, res) => {
                 'X-INSEE-Api-Key-Integration': API_KEY,
                 'Accept': 'application/json'
             },
-            params: { q, nombre: 500}
+            params: { q, nombre: 1000}
         });
         console.log(`✅ Connexion réussie ! Total : ${response.data.header?.total}`);
 
